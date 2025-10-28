@@ -2,7 +2,6 @@
 import React from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import Image from "next/image";
-import TranxBitLogo from "./tranx-bit-logo";
 interface TranxBitLoaderProps {
   variant?: "light" | "dark";
   isForm?: boolean;
@@ -11,11 +10,13 @@ interface TranxBitLoaderProps {
 interface TypewriterTextProps {
   text: string;
   onComplete?: () => void;
+  isDark?: boolean;
 }
 
 const TypewriterText: React.FC<TypewriterTextProps> = ({
   text,
   onComplete,
+  isDark = false,
 }) => {
   const [displayText, setDisplayText] = React.useState("");
   const [currentIndex, setCurrentIndex] = React.useState(0);
@@ -47,7 +48,7 @@ const TypewriterText: React.FC<TypewriterTextProps> = ({
       <motion.span
         animate={{ opacity: [1, 0, 1] }}
         transition={{ duration: 1.2, repeat: Infinity }}
-        className="ml-1"
+        className={`ml-1 ${isDark ? "text-blue-400" : "text-indigo-500"}`}
       >
         |
       </motion.span>
@@ -99,6 +100,12 @@ const TranxBitLoader: React.FC<TranxBitLoaderProps> = ({
   const [currentBrandIndex, setCurrentBrandIndex] = React.useState(0);
   const [currentTextIndex, setCurrentTextIndex] = React.useState(0);
   const [typingComplete, setTypingComplete] = React.useState(false);
+  const [isMounted, setIsMounted] = React.useState(false);
+
+  // Only render animation elements after mounting on client side
+  React.useEffect(() => {
+    setIsMounted(true);
+  }, []);
 
   React.useEffect(() => {
     const interval = setInterval(() => {
@@ -129,103 +136,147 @@ const TranxBitLoader: React.FC<TranxBitLoaderProps> = ({
   const colors = {
     bg: isDark
       ? "from-slate-950 via-slate-900 to-black"
+      : isForm
+      ? "bg-gradient-to-br from-blue-50 via-slate-100 to-indigo-100"
       : "from-gray-50 via-white to-gray-100",
-    gridLine: isDark ? "rgba(255,255,255,0.03)" : "rgba(0,0,0,0.03)",
-    particle: isDark ? "bg-blue-400" : "bg-blue-600",
+    gridLine: isDark
+      ? "rgba(255,255,255,0.03)"
+      : isForm
+      ? "rgba(0,0,0,0.05)"
+      : "rgba(0,0,0,0.03)",
+    particle: isDark ? "bg-blue-400" : isForm ? "bg-indigo-500" : "bg-blue-600",
     gradient: isDark
       ? "conic-gradient(from 0deg, transparent, #3b82f6, #8b5cf6, transparent)"
+      : isForm
+      ? "conic-gradient(from 45deg, transparent, #6366f1, #4f46e5, #3730a3, transparent)"
       : "conic-gradient(from 0deg, transparent, #2563eb, #7c3aed, transparent)",
-    glowBg: isDark ? "bg-blue-500" : "bg-blue-600",
-    textPrimary: isDark ? "text-white" : "text-black",
-    textSecondary: isDark ? "text-gray-400" : "text-gray-600",
-    dotColor: isDark ? "bg-blue-400" : "bg-blue-600",
-    overlayBg: isDark ? "bg-slate-950" : "bg-white",
-    cardBg: isDark ? "bg-slate-800/50" : "bg-white/80",
-    cardBorder: isDark ? "border-slate-700" : "border-gray-200",
+    glowBg: isDark ? "bg-blue-500" : isForm ? "bg-indigo-500" : "bg-blue-600",
+    textPrimary: isDark
+      ? "text-white"
+      : isForm
+      ? "text-indigo-800"
+      : "text-black",
+    textSecondary: isDark
+      ? "text-gray-400"
+      : isForm
+      ? "text-indigo-600"
+      : "text-gray-600",
+    dotColor: isDark ? "bg-blue-400" : isForm ? "bg-indigo-500" : "bg-blue-600",
+    overlayBg: isDark ? "bg-slate-950" : isForm ? "bg-white" : "bg-white",
+    cardBg: isDark ? "bg-slate-800/50" : isForm ? "bg-white/70" : "bg-white/80",
+    cardBorder: isDark
+      ? "border-slate-700"
+      : isForm
+      ? "border-indigo-200"
+      : "border-gray-200",
+    cardShadow: isDark
+      ? "shadow-md shadow-blue-900/20"
+      : isForm
+      ? "shadow-lg shadow-indigo-500/20"
+      : "shadow-md shadow-gray-200",
   };
 
   const getOrbitPosition = (index: number, total: number) => {
     const angle = (index / total) * Math.PI * 2;
     const radius = isForm ? 200 : 280;
+    // Use parseFloat and toFixed to ensure consistent number formatting between server and client
     return {
-      x: Math.cos(angle) * radius,
-      y: Math.sin(angle) * radius,
+      x: parseFloat((Math.cos(angle) * radius).toFixed(3)),
+      y: parseFloat((Math.sin(angle) * radius).toFixed(3)),
     };
   };
 
   const containerClasses = isForm
-    ? `w-full h-screen bg-gradient-to-br ${colors.bg} flex items-center justify-center overflow-hidden relative`
+    ? `w-full min-h-screen ${colors.bg} flex items-center justify-center overflow-hidden relative`
     : `fixed inset-0 bg-gradient-to-br ${colors.bg} flex items-center justify-center overflow-hidden`;
 
   return (
     <div className={containerClasses}>
       {/* Animated background grid */}
-      <div className="absolute inset-0 opacity-20">
+      <div
+        className={`absolute inset-0 ${isForm ? "opacity-30" : "opacity-20"}`}
+      >
         <div
           className="absolute inset-0"
           style={{
             backgroundImage: `linear-gradient(${colors.gridLine} 1px, transparent 1px),
                            linear-gradient(90deg, ${colors.gridLine} 1px, transparent 1px)`,
             backgroundSize: "60px 60px",
-            animation: "gridMove 25s linear infinite",
+            animation: isMounted
+              ? `${
+                  isForm ? "gridMoveEnhanced" : "gridMove"
+                } 25s linear infinite`
+              : "none",
           }}
         />
       </div>
-
       {/* Orbiting brand logos */}
       <div className="absolute inset-0 flex items-center justify-center">
-        <motion.div
-          className="relative w-full h-full"
-          animate={{ rotate: 360 }}
-          transition={{ duration: 40, repeat: Infinity, ease: "linear" }}
-        >
-          {brands.map((brand, index) => {
-            const pos = getOrbitPosition(index, brands.length);
-            return (
-              <motion.div
-                key={brand}
-                className={`absolute top-1/2 left-1/2 ${
-                  isForm ? "w-12 h-12" : "w-16 h-16"
-                } ${colors.cardBg} backdrop-blur-sm border ${
-                  colors.cardBorder
-                } rounded-xl p-2 shadow-lg`}
-                style={{
-                  x: pos.x - (isForm ? 24 : 32),
-                  y: pos.y - (isForm ? 24 : 32),
-                }}
-                initial={{ opacity: 0, scale: 0 }}
-                animate={{
-                  opacity: currentBrandIndex === index ? 1 : 0.4,
-                  scale: currentBrandIndex === index ? 1.2 : 1,
-                }}
-                transition={{ duration: 0.5 }}
-              >
+        {isMounted ? (
+          <motion.div
+            className="relative w-full h-full"
+            animate={{ rotate: 360 }}
+            transition={{ duration: 40, repeat: Infinity, ease: "linear" }}
+          >
+            {brands.map((brand, index) => {
+              const pos = getOrbitPosition(index, brands.length);
+              return (
                 <motion.div
-                  animate={{ rotate: -360 }}
-                  transition={{
-                    duration: 40,
-                    repeat: Infinity,
-                    ease: "linear",
+                  key={brand}
+                  className={`absolute top-1/2 left-1/2 ${
+                    isForm ? "w-12 h-12" : "w-16 h-16"
+                  } ${colors.cardBg} backdrop-blur-sm border ${
+                    colors.cardBorder
+                  } rounded-xl p-2 ${colors.cardShadow} ${
+                    isForm && currentBrandIndex === index
+                      ? "ring-2 ring-indigo-400 ring-opacity-50"
+                      : ""
+                  }`}
+                  // Using translateX/Y in className instead of style for consistent hydration
+                  initial={{ opacity: 0, scale: 0 }}
+                  animate={{
+                    opacity: currentBrandIndex === index ? 1 : 0.4,
+                    scale: currentBrandIndex === index ? 1.2 : 1,
+                    x: pos.x - (isForm ? 24 : 32),
+                    y: pos.y - (isForm ? 24 : 32),
                   }}
-                  className="w-full h-full"
+                  transition={{ duration: 0.5 }}
                 >
-                  <Image
-                    src={`/brands/${brand}.svg`}
-                    alt={brand}
-                    className="w-full h-full object-contain"
-                    height={14}
-                    width={14}
-                  />
+                  <motion.div
+                    animate={{ rotate: -360 }}
+                    transition={{
+                      duration: 40,
+                      repeat: Infinity,
+                      ease: "linear",
+                    }}
+                    className="w-full h-full relative"
+                  >
+                    {isForm && currentBrandIndex === index && (
+                      <div className="absolute inset-0 bg-indigo-400/20 rounded-lg filter blur-sm animate-pulse"></div>
+                    )}
+                    <Image
+                      src={`/brands/${brand}.svg`}
+                      alt={brand}
+                      className={`w-full h-full object-contain ${
+                        isForm && currentBrandIndex === index
+                          ? "drop-shadow-md"
+                          : ""
+                      }`}
+                      height={14}
+                      width={14}
+                    />
+                  </motion.div>
                 </motion.div>
-              </motion.div>
-            );
-          })}
-        </motion.div>
-      </div>
-
+              );
+            })}
+          </motion.div>
+        ) : (
+          <div className="relative w-full h-full"></div>
+        )}
+      </div>{" "}
       {/* Center content */}
       <div className="relative z-10 flex flex-col items-center">
-        {!isForm && (
+        {!isForm && isMounted && (
           <>
             {/* Rotating gradient ring - for non-form mode only */}
             <div className={`absolute inset-0 -m-20`}>
@@ -262,36 +313,68 @@ const TranxBitLoader: React.FC<TranxBitLoaderProps> = ({
         <div className="relative">
           {isForm ? (
             // Form mode: Cleaner logo presentation
-            <motion.div
-              initial={{ opacity: 0, scale: 0.8 }}
-              animate={{ opacity: 1, scale: 1 }}
-              transition={{ duration: 0.6, ease: "easeOut" }}
-              className="flex flex-col items-center"
-            >
-              {/* Logo Placeholder - Replace with your actual logo */}
-              <TranxBitLogo variant="dark" size="medium" />
-
-              {/* Typing Animation */}
-              <div className="h-16 flex items-center justify-center min-w-[300px]">
-                <AnimatePresence mode="wait">
-                  <motion.h2
-                    key={currentTextIndex}
-                    className={`text-xl font-semibold ${colors.textPrimary} text-center`}
-                    initial={{ opacity: 0, y: 20, filter: "blur(5px)" }}
-                    animate={{ opacity: 1, y: 0, filter: "blur(0px)" }}
-                    exit={{ opacity: 0, y: -20, filter: "blur(5px)" }}
-                    transition={{ duration: 0.6, ease: "easeOut" }}
-                  >
-                    <TypewriterText
-                      text={headingTexts[currentTextIndex]}
-                      onComplete={handleTypingComplete}
+            isMounted ? (
+              <motion.div
+                initial={{ opacity: 0, scale: 0.8 }}
+                animate={{ opacity: 1, scale: 1 }}
+                transition={{ duration: 0.6, ease: "easeOut" }}
+                className="flex flex-col items-center relative"
+              >
+                {!isDark && (
+                  <div className="absolute -z-10 w-80 h-80 -top-40 opacity-20">
+                    <motion.div
+                      animate={{
+                        rotate: 360,
+                        opacity: [0.5, 0.8, 0.5],
+                      }}
+                      transition={{
+                        rotate: {
+                          duration: 20,
+                          repeat: Infinity,
+                          ease: "linear",
+                        },
+                        opacity: {
+                          duration: 3,
+                          repeat: Infinity,
+                          ease: "easeInOut",
+                        },
+                      }}
+                      className="w-full h-full rounded-full bg-gradient-to-br from-indigo-300 to-blue-400 blur-3xl"
                     />
-                  </motion.h2>
-                </AnimatePresence>
+                  </div>
+                )}
+                {/* Logo Placeholder - Replace with your actual logo */}
+                {/* <TranxBitLogo variant="dark" size="medium" /> */}
+
+                {/* Typing Animation */}
+                <div className="h-16 flex items-center justify-center min-w-[300px]">
+                  <AnimatePresence mode="wait">
+                    <motion.h2
+                      key={currentTextIndex}
+                      className={`text-xl font-semibold ${
+                        colors.textPrimary
+                      } text-center ${isForm ? "drop-shadow-sm" : ""}`}
+                      initial={{ opacity: 0, y: 20, filter: "blur(5px)" }}
+                      animate={{ opacity: 1, y: 0, filter: "blur(0px)" }}
+                      exit={{ opacity: 0, y: -20, filter: "blur(5px)" }}
+                      transition={{ duration: 0.6, ease: "easeOut" }}
+                    >
+                      <TypewriterText
+                        text={headingTexts[currentTextIndex]}
+                        onComplete={handleTypingComplete}
+                        isDark={isDark}
+                      />
+                    </motion.h2>
+                  </AnimatePresence>
+                </div>
+              </motion.div>
+            ) : (
+              <div className="flex flex-col items-center">
+                <div className="h-16 flex items-center justify-center min-w-[300px]"></div>
               </div>
-            </motion.div>
-          ) : (
-            // Non-form mode: Original animated logo
+            )
+          ) : // Non-form mode: Original animated logo
+          isMounted ? (
             <motion.div
               animate={{ scale: [1, 1.05, 1] }}
               transition={{ duration: 2, repeat: Infinity, ease: "easeInOut" }}
@@ -361,11 +444,13 @@ const TranxBitLoader: React.FC<TranxBitLoaderProps> = ({
                 </g>
               </svg>
             </motion.div>
+          ) : (
+            <div className="w-[100px] h-[100px]"></div>
           )}
         </div>
 
         {/* Content below logo - different based on mode */}
-        {!isForm && (
+        {!isForm && isMounted && (
           // Loading mode: Show featured brand and connecting message
           <>
             <AnimatePresence mode="wait">
@@ -391,56 +476,68 @@ const TranxBitLoader: React.FC<TranxBitLoaderProps> = ({
               </motion.div>
             </AnimatePresence>
 
-            <motion.div
-              className="mt-20 text-center"
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              transition={{ delay: 0.5 }}
-            >
-              <div className="flex items-center justify-center gap-3 mb-3">
-                <span className={`text-2xl font-bold ${colors.textPrimary}`}>
-                  Tranx
-                </span>
-                <span className={`text-2xl font-bold ${colors.textSecondary}`}>
-                  B
-                </span>
-                <span className={`text-2xl font-bold ${colors.textSecondary}`}>
-                  $t
-                </span>
-              </div>
-              {/* <motion.p
+            {isMounted ? (
+              <motion.div
+                className="mt-20 text-center"
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                transition={{ delay: 0.5 }}
+              >
+                <div className="flex items-center justify-center gap-3 mb-3">
+                  <span className={`text-2xl font-bold ${colors.textPrimary}`}>
+                    Tranx
+                  </span>
+                  <span
+                    className={`text-2xl font-bold ${colors.textSecondary}`}
+                  >
+                    B
+                  </span>
+                  <span
+                    className={`text-2xl font-bold ${colors.textSecondary}`}
+                  >
+                    $t
+                  </span>
+                </div>
+                {/* <motion.p
                 className={`text-sm ${colors.textSecondary} mb-3`}
                 animate={{ opacity: [0.5, 1, 0.5] }}
                 transition={{ duration: 2, repeat: Infinity }}
               >
                
               </motion.p> */}
-              <div className="flex items-center justify-center gap-1">
-                {[0, 1, 2].map((i) => (
-                  <motion.div
-                    key={i}
-                    className={`w-2 h-2 ${colors.dotColor} rounded-full`}
-                    animate={{
-                      y: [-4, 4, -4],
-                      opacity: [0.5, 1, 0.5],
-                    }}
-                    transition={{
-                      duration: 1.4,
-                      repeat: Infinity,
-                      delay: i * 0.2,
-                    }}
-                  />
-                ))}
-              </div>
-            </motion.div>
+                <div className="flex items-center justify-center gap-1">
+                  {[0, 1, 2].map((i) => (
+                    <motion.div
+                      key={i}
+                      className={`w-2 h-2 ${colors.dotColor} rounded-full`}
+                      animate={{
+                        y: [-4, 4, -4],
+                        opacity: [0.5, 1, 0.5],
+                      }}
+                      transition={{
+                        duration: 1.4,
+                        repeat: Infinity,
+                        delay: i * 0.2,
+                      }}
+                    />
+                  ))}
+                </div>
+              </motion.div>
+            ) : (
+              <div className="mt-20 text-center"></div>
+            )}
           </>
         )}
       </div>
-
       <style>{`
         @keyframes gridMove {
           0% { transform: translate(0, 0); }
           100% { transform: translate(60px, 60px); }
+        }
+        @keyframes gridMoveEnhanced {
+          0% { transform: translate(0, 0); opacity: 0.7; }
+          50% { opacity: 1; }
+          100% { transform: translate(60px, 60px); opacity: 0.7; }
         }
       `}</style>
     </div>

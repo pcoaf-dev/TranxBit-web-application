@@ -1,4 +1,3 @@
-
 "use client";
 import { useState } from "react";
 import { Input } from "@/components/ui/input";
@@ -8,7 +7,7 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { motion } from "framer-motion";
 import { formVariants } from "@/lib/utils";
 import { Loader } from "lucide-react";
-
+// import { useRouter } from "next/navigation";
 // import { toast } from "sonner";
 
 // import { sendGAEvent } from "@next/third-parties/google";
@@ -31,7 +30,7 @@ export function LoginForm({
   const [password, setPassword] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
-//   const { login } = useAuth();
+  //   const { login } = useAuth();
   const router = useRouter();
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -39,16 +38,20 @@ export function LoginForm({
     setIsLoading(true);
 
     try {
-     
-      // Login function will handle other redirects
-      // The loading state will be maintained until the page actually changes
+      if(!email || !password) {
+        throw new Error("Email and password are required");
+      }
+
+      // mock login 
+      router.push("/dashboard");
+      
     } catch (error: any) {
       setPassword("");
-    //   toast.error("Login failed, please try again");
-    //   sendGAEvent("formSubmission", "submit", {
-    //     authType: "loginForm",
-    //     status: "failed",
-    //   });
+      //   toast.error("Login failed, please try again");
+      //   sendGAEvent("formSubmission", "submit", {
+      //     authType: "loginForm",
+      //     status: "failed",
+      //   });
       setIsLoading(false);
     }
   };
@@ -59,23 +62,23 @@ export function LoginForm({
       initial="hidden"
       animate="visible"
       exit="exit"
-      className="space-y-6"
+      className="space-y-8 flex flex-col justify-center max-w-md mx-auto w-full py-8"
     >
       {/* Google Sign In */}
       {/* <GoogleButton /> */}
 
       {/* Divider */}
-      <div className="relative">
+      {/* <div className="relative ">
         <div className="absolute inset-0 flex items-center">
           <span className="w-full border-t border-gray-300" />
         </div>
         <div className="relative flex justify-center text-sm">
           <span className="bg-background px-2 text-muted-foreground">OR</span>
         </div>
-      </div>
+      </div> */}
 
       {/* Email/Password Form */}
-      <form onSubmit={handleSubmit} className="space-y-4">
+      <form onSubmit={handleSubmit} className="space-y-5">
         <div>
           <Input
             type="email"
@@ -83,7 +86,7 @@ export function LoginForm({
             value={email}
             onChange={(e) => setEmail(e.target.value)}
             required
-            className="border-borderColorPrimary focus-visible:outline-none"
+            className="border-borderColorPrimary focus-visible:outline-none h-12"
           />
         </div>
 
@@ -94,17 +97,17 @@ export function LoginForm({
             value={password}
             onChange={(e) => setPassword(e.target.value)}
             required
-            className="border-borderColorPrimary focus-visible:outline-none"
+            className="border-borderColorPrimary focus-visible:outline-none h-12"
           />
         </div>
 
-        <div className="flex justify-between items-center">
+        <div className="flex justify-between items-center pt-1 pb-2">
           <div className="flex items-center space-x-2">
             <Checkbox
               id="show-password"
               checked={showPassword}
               onCheckedChange={(checked) => setShowPassword(checked as boolean)}
-              className="border-borderColorPrimary focus-visible:outline-none"
+              className="border focus-visible:outline-none"
             />
             <label
               htmlFor="show-password"
@@ -126,7 +129,7 @@ export function LoginForm({
         <Button
           variant="secondary"
           type="submit"
-          className="w-full bg-black text-white"
+          className="w-full bg-black hover:bg-gray-900 text-white h-12 mt-6"
           disabled={isLoading}
         >
           {isLoading ? (
@@ -155,7 +158,7 @@ export function LoginForm({
 
       {/* Terms */}
       <div className="text-center text-xs text-muted-foreground">
-        By continuing, you agree to Alle-AI&apos;s{" "}
+        By continuing, you agree to TranxBit&apos;s{" "}
         <Link href="/terms-of-service" target="_blank" className="underline">
           Terms of Service
         </Link>{" "}

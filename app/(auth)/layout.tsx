@@ -19,14 +19,14 @@ export default function AuthLayout({
   //   }
 
   return (
-    <div className="flex min-h-screen">
+    <div className=" flex min-h-screen ">
       {/* Left side - Auth Forms */}
-      <div className="w-full xl:w-1/3   2xl:w-1/2 p-6 xs:p-10 md:mt-10">
+      <div className="w-full bg-background mt-0 xl:w-1/3  flex flex-col    2xl:w-1/2 p-6 xs:p-10 md:mt-10">
         {children}
       </div>
 
       {/* Updated right side - hidden on mobile */}
-      <div className="hidden  md:block xl:w-2/3 relative overflow-hidden bg-background pointer-events-none">
+      <div className="hidden  md:block xl:w-2/3 min-h-screen  relative overflow-hidden  pointer-events-none">
         <TranxBitLoader variant="light" isForm={true} />
       </div>
     </div>

@@ -1,12 +1,9 @@
 // import TranxBitLoader from "@/components/design/Loading-screen"
-
+import Sidebar from "@/components/layout/side-bar";
 export default function Page() {
   return (
-    <div className="prose min-h-screen bg-dark-gradient-purple-2">
-      {/* <TranxBitLoader  variant="light" isForm={true}  /> */}
-
-
-      <h2 className="text-muted-foreground font-bold">clinton is here </h2>
+    <div className=" min-h-screen bg-brand-gradient-accent">
+      <Sidebar />
     </div>
   );
 }

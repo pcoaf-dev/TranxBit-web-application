@@ -4,14 +4,9 @@ import { useState, useEffect, useMemo, useCallback } from "react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
-// import { GoogleButton } from "./GoogleButton";
 import { motion } from "framer-motion";
 import { formVariants } from "@/lib/utils";
-import { Loader, Check, X } from "lucide-react";
-// import { useAuth } from "@/components/providers/AuthProvider";
-// import { toast } from "sonner";
-// import { sendGAEvent } from "@next/third-parties/google";
-// import { useRouter } from "next/navigation";
+import { Loader, Check, X, ChevronDown } from "lucide-react";
 import Link from "next/link";
 import {
   Popover,
@@ -19,6 +14,13 @@ import {
   PopoverContent,
 } from "@/components/ui/popover";
 import { Progress } from "@/components/ui/progress";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 
 interface RegisterFormProps {
   onSwitchMode: () => void;
@@ -26,9 +28,9 @@ interface RegisterFormProps {
 }
 
 interface FormValidation {
-  firstName: boolean;
-  lastName: boolean;
+  username: boolean;
   email: boolean;
+  phone: boolean;
   password: {
     hasMinLength: boolean;
     hasUpperCase: boolean;
@@ -39,19 +41,25 @@ interface FormValidation {
   };
 }
 
+const COUNTRIES = {
+  ghana: { name: "Ghana", code: "+233", flag: "🇬🇭" },
+  nigeria: { name: "Nigeria", code: "+234", flag: "🇳🇬" },
+};
+
 const useFormValidation = () => {
   const [formData, setFormData] = useState({
-    firstName: "",
-    lastName: "",
+    username: "",
     email: "",
+    country: "ghana" as keyof typeof COUNTRIES,
+    phone: "",
     password: "",
     confirmPassword: "",
   });
 
   const [validation, setValidation] = useState<FormValidation>({
-    firstName: false,
-    lastName: false,
+    username: false,
     email: false,
+    phone: false,
     password: {
       hasMinLength: false,
       hasUpperCase: false,
@@ -72,9 +80,9 @@ const useFormValidation = () => {
   useEffect(() => {
     const validateForm = () => {
       setValidation({
-        firstName: formData.firstName.length >= 2,
-        lastName: formData.lastName.length >= 2,
+        username: formData.username.length >= 3,
         email: /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email),
+        phone: /^\d{9,10}$/.test(formData.phone),
         password: {
           hasMinLength: formData.password.length >= 8,
           hasUpperCase: /[A-Z]/.test(formData.password),
@@ -119,7 +127,6 @@ const ValidationItem = ({
   </motion.div>
 );
 
-// Muted style for password popover (avoid alarming red as user types)
 const PasswordValidationItem = ({
   isValid,
   text,
@@ -145,7 +152,6 @@ export const RegisterForm = ({
 }: RegisterFormProps) => {
   const [isLoading, setIsLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
-  //   const { register } = useAuth();
 
   const { formData, validation, updateFormData } = useFormValidation();
   const [showPasswordHelp, setShowPasswordHelp] = useState(false);
@@ -185,18 +191,15 @@ export const RegisterForm = ({
     return pwd.toLowerCase() === email.toLowerCase();
   }, [formData.password, formData.email]);
 
-  const isPasswordSameAsName = useMemo(() => {
+  const isPasswordSameAsUsername = useMemo(() => {
     const pwd = formData.password.trim();
-    const fn = formData.firstName.trim();
-    const ln = formData.lastName.trim();
-    if (!pwd) return false;
-    const lowerPwd = pwd.toLowerCase();
-    if (fn && lowerPwd === fn.toLowerCase()) return true;
-    if (ln && lowerPwd === ln.toLowerCase()) return true;
-    return false;
-  }, [formData.password, formData.firstName, formData.lastName]);
+    const username = formData.username.trim();
+    if (!pwd || !username) return false;
+    return pwd.toLowerCase() === username.toLowerCase();
+  }, [formData.password, formData.username]);
 
-  const hasForbiddenPassword = isPasswordSameAsEmail || isPasswordSameAsName;
+  const hasForbiddenPassword =
+    isPasswordSameAsEmail || isPasswordSameAsUsername;
 
   const handleSubmit = useCallback(
     async (e: React.FormEvent) => {
@@ -204,12 +207,16 @@ export const RegisterForm = ({
       setIsLoading(true);
 
       try {
-        if (!validation.firstName || !validation.lastName) {
-          throw new Error("First and last name must be at least 2 characters");
+        if (!validation.username) {
+          throw new Error("Username must be at least 3 characters");
         }
 
         if (!validation.email) {
           throw new Error("Please enter a valid email address");
+        }
+
+        if (!validation.phone) {
+          throw new Error("Please enter a valid phone number");
         }
 
         if (!Object.values(validation.password).every(Boolean)) {
@@ -220,49 +227,26 @@ export const RegisterForm = ({
           throw new Error("Password cannot be the same as your email");
         }
 
-        if (isPasswordSameAsName) {
-          throw new Error("Password cannot be your name");
+        if (isPasswordSameAsUsername) {
+          throw new Error("Password cannot be your username");
         }
 
-        // const result = await register({
-        //   first_name: formData.firstName,
-        //   last_name: formData.lastName,
-        //   email: formData.email,
-        //   password: formData.password,
-        //   password_confirmation: formData.confirmPassword,
-        // });
-
-        // sendGAEvent("formSubmission", "submit", {
-        //   formType: "registerForm",
-        //   status: "success",
-        // });
-
-        // if (result && result.to === "verify-email") {
-        //   onRegister(formData.email);
-        //   setIsLoading(false);
-        // }
+        // Registration logic here
+        console.log("Registration data:", {
+          username: formData.username,
+          email: formData.email,
+          country: formData.country,
+          phone: COUNTRIES[formData.country].code + formData.phone,
+          password: formData.password,
+        });
       } catch (error) {
-        // toast.error(
-        //   error.message ||
-        //     error.response?.data?.message ||
-        //     "Please check your information and try again"
-        // );
         setIsLoading(false);
-        // sendGAEvent("formSubmission", "submit", {
-        //   formType: "registerForm",
-        //   status: "failed",
-        // });
       }
     },
-    [
-      //   formData,
-      validation,
-      //   register,
-      //   onRegister,
-      isPasswordSameAsEmail,
-      isPasswordSameAsName,
-    ]
+    [formData, validation, isPasswordSameAsEmail, isPasswordSameAsUsername]
   );
+
+  const currentCountry = COUNTRIES[formData.country];
 
   const renderForm = useMemo(
     () => (
@@ -271,54 +255,24 @@ export const RegisterForm = ({
         initial="hidden"
         animate="visible"
         exit="exit"
-        className="space-y-6"
+        className="space-y-8 flex flex-col justify-center max-w-md mx-auto w-full py-8"
       >
-        {/* Google Sign Up */}
-        {/* <GoogleButton /> */}
-
-        {/* Divider */}
-        <div className="relative">
-          <div className="absolute inset-0 flex items-center">
-            <span className="w-full border-t border-gray-300" />
-          </div>
-          <div className="relative flex justify-center text-sm">
-            <span className="bg-background px-2 text-gray-500">OR</span>
-          </div>
-        </div>
-
         {/* Registration Form */}
-        <form onSubmit={handleSubmit} className="space-y-4">
-          <div className="grid grid-cols-2 gap-4">
-            <div className="space-y-2">
-              <Input
-                placeholder="First name"
-                value={formData.firstName}
-                onChange={(e) => updateFormData("firstName", e.target.value)}
-                required
-                className="border-borderColorPrimary focus-visible:outline-none"
+        <form onSubmit={handleSubmit} className="space-y-5">
+          <div className="space-y-2">
+            <Input
+              placeholder="Username"
+              value={formData.username}
+              onChange={(e) => updateFormData("username", e.target.value)}
+              required
+              className="border-borderColorPrimary focus-visible:outline-none h-12"
+            />
+            {formData.username && (
+              <ValidationItem
+                isValid={validation.username}
+                text="At least 3 characters"
               />
-              {formData.firstName && (
-                <ValidationItem
-                  isValid={validation.firstName}
-                  text="At least 2 characters"
-                />
-              )}
-            </div>
-            <div className="space-y-2">
-              <Input
-                placeholder="Last Name"
-                value={formData.lastName}
-                onChange={(e) => updateFormData("lastName", e.target.value)}
-                required
-                className="border-borderColorPrimary focus-visible:outline-none"
-              />
-              {formData.lastName && (
-                <ValidationItem
-                  isValid={validation.lastName}
-                  text="At least 2 characters"
-                />
-              )}
-            </div>
+            )}
           </div>
 
           <div className="space-y-2">
@@ -328,12 +282,68 @@ export const RegisterForm = ({
               value={formData.email}
               onChange={(e) => updateFormData("email", e.target.value)}
               required
-              className="border-borderColorPrimary focus-visible:outline-none"
+              className="border-borderColorPrimary focus-visible:outline-none h-12"
             />
             {formData.email && (
               <ValidationItem
                 isValid={validation.email}
                 text="Valid email address"
+              />
+            )}
+          </div>
+
+          <div className="space-y-2">
+            <Select
+              value={formData.country}
+              onValueChange={(value) => {
+                updateFormData("country", value);
+                updateFormData("phone", "");
+              }}
+            >
+              <SelectTrigger className="border-borderColorPrimary focus-visible:outline-none h-12">
+                <SelectValue>
+                  <span className="flex items-center gap-2">
+                    <span>{currentCountry.flag}</span>
+                    <span>{currentCountry.name}</span>
+                  </span>
+                </SelectValue>
+              </SelectTrigger>
+              <SelectContent>
+                {Object.entries(COUNTRIES).map(([key, country]) => (
+                  <SelectItem key={key} value={key}>
+                    <span className="flex items-center gap-2">
+                      <span>{country.flag}</span>
+                      <span>{country.name}</span>
+                    </span>
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
+
+          <div className="space-y-2">
+            <div className="flex gap-2">
+              <div className="flex items-center justify-center px-3 border border-borderColorPrimary rounded-md bg-muted h-12 min-w-[80px]">
+                <span className="text-sm font-medium">
+                  {currentCountry.code}
+                </span>
+              </div>
+              <Input
+                type="tel"
+                placeholder="Phone number"
+                value={formData.phone}
+                onChange={(e) => {
+                  const value = e.target.value.replace(/\D/g, "");
+                  updateFormData("phone", value);
+                }}
+                required
+                className="border-borderColorPrimary focus-visible:outline-none h-12 flex-1"
+              />
+            </div>
+            {formData.phone && (
+              <ValidationItem
+                isValid={validation.phone}
+                text="Valid phone number (9-10 digits)"
               />
             )}
           </div>
@@ -352,13 +362,13 @@ export const RegisterForm = ({
                   }}
                   onFocus={() => setShowPasswordHelp(true)}
                   required
-                  className="border-borderColorPrimary focus-visible:outline-none"
+                  className="border-borderColorPrimary focus-visible:outline-none h-12"
                 />
               </PopoverTrigger>
               <PopoverContent
                 side="top"
                 align="start"
-                className="w-[340px] p-4 bg-backgroundSecondary"
+                className="w-[340px] p-4 "
                 onOpenAutoFocus={(e) => e.preventDefault()}
                 onCloseAutoFocus={(e) => e.preventDefault()}
               >
@@ -407,7 +417,7 @@ export const RegisterForm = ({
               <div className="text-xs text-red-500">
                 {isPasswordSameAsEmail
                   ? "Password cannot be the same as your email."
-                  : "Password cannot be your name."}
+                  : "Password cannot be your username."}
               </div>
             )}
           </div>
@@ -421,7 +431,7 @@ export const RegisterForm = ({
                 updateFormData("confirmPassword", e.target.value)
               }
               required
-              className="border-borderColorPrimary focus-visible:outline-none"
+              className="border-borderColorPrimary focus-visible:outline-none h-12"
             />
             {formData.confirmPassword && (
               <ValidationItem
@@ -431,7 +441,7 @@ export const RegisterForm = ({
             )}
           </div>
 
-          <div className="flex justify-start">
+          <div className="flex justify-start pt-1 pb-2">
             <div className="flex items-center space-x-2">
               <Checkbox
                 id="show-password-register"
@@ -455,11 +465,13 @@ export const RegisterForm = ({
             type="submit"
             disabled={
               isLoading ||
-              !Object.values(validation).every(Boolean) ||
+              !validation.username ||
+              !validation.email ||
+              !validation.phone ||
               !Object.values(validation.password).every(Boolean) ||
               hasForbiddenPassword
             }
-            className="w-full bg-black text-white"
+            className="w-full bg-black hover:bg-gray-900 text-white h-12 mt-6"
           >
             {isLoading ? (
               <>
@@ -488,7 +500,7 @@ export const RegisterForm = ({
 
         {/* Terms */}
         <div className="text-center text-xs text-muted-foreground">
-          By continuing, you agree to Alle-AI&apos;s{" "}
+          By continuing, you agree to TranxBit&apos;s{" "}
           <Link href="/terms-of-service" target="_blank" className="underline">
             Terms of Service
           </Link>{" "}
@@ -512,6 +524,7 @@ export const RegisterForm = ({
       isPasswordSameAsEmail,
       passwordBarColor,
       updateFormData,
+      currentCountry,
     ]
   );
 

@@ -1,16 +1,17 @@
 import type React from "react";
 
-
 interface TranxBitLogoProps {
   variant?: "dark" | "light";
   size?: "small" | "medium" | "large";
   className?: string;
+  isMobile?: boolean;
 }
 
 const TranxBitLogo: React.FC<TranxBitLogoProps> = ({
   variant = "dark",
   size = "medium",
   className = "",
+  isMobile = false,
 }) => {
   const sizeConfig = {
     small: { height: 40, logoRadius: 18, fontSize: 16 },
@@ -83,47 +84,49 @@ const TranxBitLogo: React.FC<TranxBitLogoProps> = ({
         </g>
       </svg>
 
-      <div
-        className="font-bold flex items-center"
-        style={{
-          fontSize: `${config.fontSize}px`,
-          color: isDark ? "#000" : "#fff",
-        }}
-      >
-        <span>Tranx</span>
-        <span style={{ color: "#666" }}>B</span>
-        <span style={{ color: "#666" }}>
-          <svg
-            width={config.fontSize * 0.6}
-            height={config.fontSize * 1.2}
-            viewBox="0 0 12 24"
-            className="inline-block"
-            style={{ marginRight: "2px" }}
-          >
-            <rect x="5" y="10" width="2" height="14" fill="#666" /> 
-            <circle
-              cx="6"
-              cy="5"
-              r="4"
-              fill={isDark ? "#000" : "#fff"}
-              stroke="#666"
-              strokeWidth="1"
-            />
-            <text
-              x="6"
-              y="7.5"
-              fontSize="6"
-              fill="#666"
-              fontFamily="Arial, sans-serif"
-              fontWeight="bold"
-              textAnchor="middle"
+      {!isMobile && (
+        <div
+          className="font-bold flex items-center"
+          style={{
+            fontSize: `${config.fontSize}px`,
+            color: isDark ? "#000" : "#fff",
+          }}
+        >
+          <span>Tranx</span>
+          <span style={{ color: "#666" }}>B</span>
+          <span style={{ color: "#666" }}>
+            <svg
+              width={config.fontSize * 0.6}
+              height={config.fontSize * 1.2}
+              viewBox="0 0 12 24"
+              className="inline-block"
+              style={{ marginRight: "2px" }}
             >
-              $
-            </text>
-          </svg>
-        </span>
-        <span style={{ color: "#666" }}>t</span>
-      </div>
+              <rect x="5" y="10" width="2" height="14" fill="#666" />
+              <circle
+                cx="6"
+                cy="5"
+                r="4"
+                fill={isDark ? "#000" : "#fff"}
+                stroke="#666"
+                strokeWidth="1"
+              />
+              <text
+                x="6"
+                y="7.5"
+                fontSize="6"
+                fill="#666"
+                fontFamily="Arial, sans-serif"
+                fontWeight="bold"
+                textAnchor="middle"
+              >
+                $
+              </text>
+            </svg>
+          </span>
+          <span style={{ color: "#666" }}>t</span>
+        </div>
+      )}
     </div>
   );
 };

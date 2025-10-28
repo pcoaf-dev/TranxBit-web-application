@@ -11,6 +11,7 @@ import { RegisterForm } from "@/components/features/auth/RegisterForms";
 import { ForgotPasswordForm } from "@/components/features/auth/ForgotPasswordForm";
 import { ResetPasswordSuccess } from "@/components/features/auth/ResetPasswordSuccess";
 import { VerificationCodeForm } from "@/components/features/auth/VerificationCodeForm";
+import { useAuthMode } from "@/stores/ui-authState";
 // import { useTheme } from "next-themes";
 
 // import { useAuthCheck } from "@/hooks/use-auth-check";
@@ -26,12 +27,11 @@ type AuthMode =
 
 // Create an inner component for the auth page logic
 function AuthPageInner() {
-  const [authMode, setAuthMode] = useState<AuthMode>("login");
+  const { authMode, setAuthMode } = useAuthMode();
   const [resetEmail, setResetEmail] = useState<string>("");
   const [email, setEmail] = useState("");
   const [mounted, setMounted] = useState(false);
-  const [currentTextIndex, setCurrentTextIndex] = useState(0);
-  const [displayText, setDisplayText] = useState("");
+ 
   //   const { theme, resolvedTheme } = useTheme();
 
   useEffect(() => {
@@ -50,7 +50,7 @@ function AuthPageInner() {
   }, []);
 
   const handleForgotPassword = () => {
-    // setAuthMode("forgot-password");
+    setAuthMode("forgot-password");
     // sendGAEvent("formSubmission", "forgottenPassword", {
     //   formType: "loginForm",
     // });
@@ -117,17 +117,11 @@ function AuthPageInner() {
   };
 
   return (
-    <div className="max-w-md mx-auto">
+    <div className="max-w-md   mx-auto">
       {/* Logo */}
       <div className="flex items-center justify-center gap-2 mb-8">
         <TranxBitLogo variant="dark" size="medium" />
       </div>
-
-      {/* Heading */}
-      <h1 className="text-center text-lg font-semibold mb-6 min-h-[28px]">
-        {displayText}
-        <span className="animate-blink">|</span>
-      </h1>
 
       {/* Auth form container */}
       <div>
@@ -149,7 +143,9 @@ function AuthPageInner() {
 export default function AuthPage() {
   return (
     <Suspense fallback={<TranxBitLoader variant="light" isForm={true} />}>
-      <AuthPageInner />
+      <div className="">
+        <AuthPageInner />
+      </div>
     </Suspense>
   );
 }

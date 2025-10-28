@@ -1,7 +1,10 @@
+"use client";
 import TranxBitLogo from "../design/tranx-bit-logo";
 import { Button } from "@/components/ui/button";
 import { Menu } from "lucide-react";
 import Link from "next/link";
+import { useAuthMode } from "@/stores/ui-authState";
+import { useRouter } from "next/navigation";
 
 // Navigation links array for easy mapping
 const navigationLinks = [
@@ -11,6 +14,8 @@ const navigationLinks = [
 ];
 
 export function Header() {
+  const router = useRouter();
+  const { setAuthMode } = useAuthMode();
   return (
     <header className="fixed top-4 left-1/2 transform -translate-x-1/2 z-50 w-full max-w-5xl px-4">
       <div className="bg-white rounded-full shadow-xl border border-gray-100 px-6 py-3 flex items-center justify-between">
@@ -40,6 +45,10 @@ export function Header() {
         </nav>
         <div className="flex items-center gap-3">
           <Button
+            onClick={() => {
+              setAuthMode("login");
+              router.push("/auth");
+            }}
             variant="ghost"
             className="text-sm bg-white text-gray-700 hover:bg-gray-50 rounded-full px-4 py-2 font-medium border border-gray-200 transition-all duration-300 hover:shadow-sm hover:border-gray-300 hover:scale-105"
           >
@@ -49,8 +58,11 @@ export function Header() {
             <div className="absolute inset-0 duration-1000 opacity-60 transition-all bg-gradient-to-r from-indigo-500 via-pink-500 to-yellow-400 rounded-xl blur-lg filter group-hover:opacity-100 group-hover:duration-200"></div>
             {/* Signup button with glow effect and arrow animation */}
             <Button
+              onClick={() => {
+                setAuthMode("register");
+                router.push("/auth");
+              }}
               className="relative bg-gray-900 px-8 py-3 rounded-xl text-white transition-all duration-200 hover:bg-gray-800 hover:shadow-lg hover:-translate-y-0.5 hover:shadow-gray-600/30"
-             
             >
               Signup
               <svg

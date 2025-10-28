@@ -1,16 +1,35 @@
-import { useState } from "react";
+import { useState, useRef } from "react";
 import { Plus, Minus } from "lucide-react";
-import { Card, CardContent } from "@/components/ui/card";
-import { Button } from "../ui/button";
+import { motion, useInView } from "framer-motion";
 import Image from "next/image";
 export default function TranxbitFAQ() {
-  const [openIndex, setOpenIndex] = useState<number | null>(null);
-const teamImages = [
-  { id: 1, src: "/profiles/profile-1.jpeg", alt: "Team member 1" },
-  { id: 2, src: "/profiles/profile-2.jpeg", alt: "Team member 2" },
-  { id: 3, src: "/profiles/profile-3.jpeg", alt: "Team member 3" },
-];
-  // FAQ data - easily modifiable
+  const [openIndex, setOpenIndex] = useState(null);
+  const headingRef = useRef(null);
+  const faqRef = useRef(null);
+  const cardRef = useRef(null);
+
+  const headingInView = useInView(headingRef, { once: true, margin: "-100px" });
+  const faqInView = useInView(faqRef, { once: true, margin: "-50px" });
+  const cardInView = useInView(cardRef, { once: true, margin: "-100px" });
+
+  const teamImages = [
+    {
+      id: 1,
+      src: "https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=200&h=200&fit=crop",
+      alt: "Team member 1",
+    },
+    {
+      id: 2,
+      src: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=200&h=200&fit=crop",
+      alt: "Team member 2",
+    },
+    {
+      id: 3,
+      src: "https://images.unsplash.com/photo-1573497019940-1c28c88b4f3e?w=200&h=200&fit=crop",
+      alt: "Team member 3",
+    },
+  ];
+
   const faqs = [
     {
       question: "How does Tranxbit work?",
@@ -49,28 +68,94 @@ const teamImages = [
     },
   ];
 
-  const toggleFAQ = (index: number) => {
+  const toggleFAQ = (index) => {
     setOpenIndex(openIndex === index ? null : index);
+  };
+
+  const containerVariants = {
+    hidden: { opacity: 0 },
+    visible: {
+      opacity: 1,
+      transition: {
+        staggerChildren: 0.08,
+        delayChildren: 0.1,
+      },
+    },
+  };
+
+  const faqItemVariants = {
+    hidden: {
+      opacity: 0,
+      x: -30,
+    },
+    visible: {
+      opacity: 1,
+      x: 0,
+      transition: {
+        duration: 0.5,
+        ease: [0.22, 1, 0.36, 1],
+      },
+    },
+  };
+
+  const headingVariants = {
+    hidden: { opacity: 0, y: 30 },
+    visible: {
+      opacity: 1,
+      y: 0,
+      transition: {
+        duration: 0.7,
+        ease: [0.22, 1, 0.36, 1],
+      },
+    },
+  };
+
+  const cardVariants = {
+    hidden: {
+      opacity: 0,
+      y: 50,
+    },
+    visible: {
+      opacity: 1,
+      y: 0,
+      transition: {
+        duration: 0.7,
+        ease: [0.22, 1, 0.36, 1],
+      },
+    },
   };
 
   return (
     <div className="py-16 px-4">
       <div className="max-w-5xl mx-auto">
         {/* Centered heading */}
-        <div className="text-center mb-12">
-          <h1 className="text-5xl font-bold mb-4 ">
+        <motion.div
+          ref={headingRef}
+          className="text-center mb-12"
+          initial="hidden"
+          animate={headingInView ? "visible" : "hidden"}
+          variants={headingVariants}
+        >
+          <h1 className="text-5xl font-bold mb-4">
             Frequently Asked Questions
           </h1>
           <span className="text-lg">
             Everything you need to know about the us.
           </span>
-        </div>
+        </motion.div>
 
         {/* Card-based questions */}
-        <div className="space-y-0">
+        <motion.div
+          ref={faqRef}
+          className="space-y-0"
+          initial="hidden"
+          animate={faqInView ? "visible" : "hidden"}
+          variants={containerVariants}
+        >
           {faqs.map((faq, index) => (
-            <div
+            <motion.div
               key={index}
+              variants={faqItemVariants}
               className={`overflow-hidden transition-all duration-300 ${
                 openIndex !== index ? "" : ""
               } ${index !== 0 ? "border-t border-gray-200 pt-4" : ""}`}
@@ -91,40 +176,67 @@ const teamImages = [
                 </div>
               </button>
 
-              <div
-                className={`transition-all duration-300 ease-in-out ${
-                  openIndex === index
-                    ? "max-h-96 bg-transparent border-none"
-                    : "max-h-0 opacity-0"
-                }`}
+              <motion.div
+                initial={false}
+                animate={{
+                  height: openIndex === index ? "auto" : 0,
+                  opacity: openIndex === index ? 1 : 0,
+                }}
+                transition={{
+                  duration: 0.3,
+                  ease: "easeInOut",
+                }}
+                className="overflow-hidden"
               >
                 <div className="px-8 pb-8 text-gray-700 leading-relaxed">
                   {faq.answer}
                 </div>
-              </div>
-            </div>
+              </motion.div>
+            </motion.div>
           ))}
-        </div>
+        </motion.div>
 
         {/* Team Images */}
-        <div className="flex justify-center mt-16">
-          <Card className="w-full max-w-2xl">
-            <CardContent className="pt-6 pb-6 px-6 text-center">
+        <motion.div
+          ref={cardRef}
+          className="flex justify-center mt-16"
+          initial="hidden"
+          animate={cardInView ? "visible" : "hidden"}
+          variants={cardVariants}
+        >
+          <div className="w-full max-w-2xl bg-white rounded-lg shadow border border-gray-100">
+            <div className="pt-6 pb-6 px-6 text-center">
               {/* Profile Images */}
               <div className="flex justify-center mb-8">
                 <div className="flex -space-x-4">
-                  {teamImages.map((img) => (
-                    <div
+                  {teamImages.map((img, i) => (
+                    <motion.div
                       key={img.id}
+                      initial={{ opacity: 0, scale: 0.5 }}
+                      animate={
+                        cardInView
+                          ? {
+                              opacity: 1,
+                              scale: 1,
+                            }
+                          : {
+                              opacity: 0,
+                              scale: 0.5,
+                            }
+                      }
+                      transition={{
+                        delay: 0.2 + i * 0.1,
+                        duration: 0.5,
+                      }}
                       className="w-20 h-20 rounded-full bg-gray-200 border-4 border-white overflow-hidden relative"
                     >
-                      <Image
+                      <img
                         src={img.src}
                         alt={img.alt}
-                        fill
-                        className="object-cover"
+                        
+                        className="w-full h-full object-cover"
                       />
-                    </div>
+                    </motion.div>
                   ))}
                 </div>
               </div>
@@ -144,7 +256,7 @@ const teamImages = [
               <div className="flex justify-center">
                 <div className="relative inline-flex items-center justify-center group">
                   <div className="absolute inset-0 duration-1000 opacity-60 transition-all bg-gradient-to-r from-indigo-500 via-pink-500 to-yellow-400 rounded-xl blur-lg filter group-hover:opacity-100 group-hover:duration-200"></div>
-                  <Button className="relative bg-gray-900 px-8 py-3 rounded-xl text-white transition-all duration-200 hover:bg-gray-800 hover:shadow-lg hover:-translate-y-0.5 hover:shadow-gray-600/30">
+                  <button className="relative bg-gray-900 px-8 py-3 rounded-xl text-white transition-all duration-200 hover:bg-gray-800 hover:shadow-lg hover:-translate-y-0.5 hover:shadow-gray-600/30">
                     Get in touch
                     <svg
                       className="ml-2 inline-block stroke-white stroke-2"
@@ -163,12 +275,12 @@ const teamImages = [
                         d="M1 1l4 4-4 4"
                       ></path>
                     </svg>
-                  </Button>
+                  </button>
                 </div>
               </div>
-            </CardContent>
-          </Card>
-        </div>
+            </div>
+          </div>
+        </motion.div>
       </div>
     </div>
   );

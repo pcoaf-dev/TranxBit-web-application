@@ -6,7 +6,19 @@
 @custom-variant dark (&:is(.dark *));
 
 @theme inline {
-  --color-background: var(--background);
+  --color-background: #fff;
+  --color-backgroundSecondary: rgb(244 244 244 / 1);
+  --color-sideBarBackground: #f9f9f9;
+  --color-borderColorPrimary: rgba(0, 0, 0, 0.1);
+  --color-buttonBackground: #676767;
+  --color-bodyColor: #0e0d0d;
+  --color-bodyColorAlt: #fcfbfb;
+  --color-hoverColorPrimary: rgba(233, 231, 231, 0.664);
+  --color-secondary: #ececec;
+  --color-toastBackgroundColor: #f0fdf4;
+  --color-infoColorPrimary: 178 60.45% 43.28%;
+
+  /* --color-background: var(--background); */
   --color-foreground: var(--foreground);
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
@@ -44,7 +56,42 @@
   --radius-lg: var(--radius);
   --radius-xl: calc(var(--radius) + 4px);
   --color-primary-100: #f0ebff;
+  /* SOLID COLORS */
+  --color-brand-bg: #f9fafb;
+  --color-brand-surface: #ffffff;
+  --color-brand-text: #111827;
+  --color-brand-text-light: #6b7280;
 
+  --color-brand-primary: #4f46e5;
+  --color-brand-primary-light: #6366f1;
+  --color-brand-secondary: #06b6d4;
+  --color-brand-accent: #f43f5e;
+
+  --color-brand-success: #10b981;
+  --color-brand-warning: #f59e0b;
+  --color-brand-error: #ef4444;
+
+  /* GRADIENTS */
+  --color-brand-gradient-primary: linear-gradient(
+    135deg,
+    #6366f1 0%,
+    #4f46e5 100%
+  );
+  --color-brand-gradient-secondary: linear-gradient(
+    135deg,
+    #06b6d4 0%,
+    #0891b2 100%
+  );
+  --color-brand-gradient-accent: linear-gradient(
+    135deg,
+    #f43f5e 0%,
+    #be123c 100%
+  );
+  --color-brand-gradient-surface: linear-gradient(
+    135deg,
+    #f9fafb 0%,
+    #e5e7eb 100%
+  );
 }
 :root {
   --radius: 0.625rem;
@@ -79,44 +126,6 @@
   --sidebar-accent-foreground: oklch(0.205 0 0);
   --sidebar-border: oklch(0.922 0 0);
   --sidebar-ring: oklch(0.708 0 0);
-    --gradient-dark-purple-1: linear-gradient(
-    to bottom right,
-    #000000,
-    #1a0a2e,
-    #3d1a5f
-  );
-  --gradient-dark-purple-2: linear-gradient(
-    to bottom right,
-    #000000,
-    #2d1b4e,
-    #5b21b6
-  ); /* looks better to me */
-  --gradient-dark-purple-3: linear-gradient(
-    to bottom right,
-    #0f172a,
-    #1e1b4b,
-    #0f172a
-  );
-
-  /* Light mode gradients */
-  --gradient-light-purple-1: linear-gradient(
-    to bottom right,
-    #ffffff,
-    #faf5ff,
-    #f3e8ff
-  );
-  --gradient-light-purple-2: linear-gradient(
-    to bottom right,
-    #f9fafb,
-    #faf5ff,
-    #e0e7ff
-  );
-  --gradient-light-purple-3: linear-gradient(
-    to bottom right,
-    #ffffff,
-    #eff6ff,
-    #f5f3ff
-  );
 }
 
 .dark {

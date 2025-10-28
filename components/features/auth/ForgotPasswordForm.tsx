@@ -71,7 +71,7 @@ export function ForgotPasswordForm({
         <Button
           variant="secondary"
           type="submit"
-          className="w-full bg-black text-white"
+          className="w-full bg-black hover:bg-gray-800 text-white"
           disabled={isLoading}
         >
           {isLoading ? (

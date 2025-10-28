@@ -2,8 +2,16 @@
 import Image from "next/image";
 import React from "react";
 import { motion } from "framer-motion";
-
+import { useRouter } from "next/navigation";
+import { useAuthMode } from "@/stores/ui-authState";
 export default function HeroSection() {
+  const router = useRouter();
+  const { setAuthMode } = useAuthMode();
+
+  const handleGetStarted = () => {
+    setAuthMode("login");
+    router.push("/auth");
+  };
   return (
     <div className="relative w-full h-screen overflow-hidden bg-[#f9f9f9]">
       {/* Large Organic Blob Shapes - Layered */}
@@ -148,12 +156,17 @@ export default function HeroSection() {
       </div>
 
       {/* Content Container */}
-      <div className="relative z-10 h-full flex items-center">
-        <div className="container mx-auto px-8 lg:px-16">
-          <div className="max-w-2xl">
+      <div className="relative z-10 h-full flex items-center justify-center">
+        <div className="container mx-auto px-8 lg:px-16 flex flex-col items-center">
+          <motion.div
+            className="max-w-2xl text-center"
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5, ease: "easeOut" }}
+          >
             <h1 className="text-5xl lg:text-6xl font-bold text-gray-800 mb-6 leading-tight">
               <span className="bg-gradient-to-r from-gray-800 via-gray-700 to-gray-900 bg-clip-text text-transparent">
-                TranXbit
+                TranxBit
               </span>{" "}
               — Your Gateway to Gift Cards &amp; Digital Payments
             </h1>
@@ -164,7 +177,15 @@ export default function HeroSection() {
             </p>
             <div className="relative inline-flex items-center justify-center group">
               <div className="absolute inset-0 duration-1000 opacity-60 transition-all bg-gradient-to-r from-indigo-500 via-pink-500 to-yellow-400 rounded-xl blur-lg filter group-hover:opacity-100 group-hover:duration-200"></div>
-              <button className="relative bg-gray-900 px-8 py-3 rounded-xl text-white transition-all duration-200 hover:bg-gray-800 hover:shadow-lg hover:-translate-y-0.5 hover:shadow-gray-600/30">
+              <motion.button
+                className="relative bg-gray-900 px-8 py-3 rounded-xl text-white transition-all duration-200 hover:bg-gray-800 hover:shadow-lg hover:-translate-y-0.5 hover:shadow-gray-600/30"
+                whileHover={{ scale: 1.03 }}
+                whileTap={{ scale: 0.98 }}
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                onClick={handleGetStarted}
+                transition={{ delay: 0.3, duration: 0.4 }}
+              >
                 Get Started Now
                 <svg
                   className="ml-2 inline-block stroke-white stroke-2"
@@ -183,50 +204,30 @@ export default function HeroSection() {
                     d="M1 1l4 4-4 4"
                   ></path>
                 </svg>
-              </button>
+              </motion.button>
             </div>
-          </div>
+          </motion.div>
         </div>
 
-        {/* Gift Cards - Cascade/Ribbon Spread Effect with Framer Motion */}
-        <div className="absolute z-20 right-20 top-1/2 transform -translate-y-1/2 w-[500px] h-[500px] flex items-center justify-center">
+        {/* Gift Cards - Clustered on Left Side */}
+        <div className="absolute z-20 left-20 top-1/2 transform -translate-y-1/2 w-[500px] h-[500px] flex items-center justify-center pointer-events-none">
           {/* Card 1 - Back card */}
           <motion.div
-            className="absolute"
+            className="absolute pointer-events-auto"
+            style={{ top: "-60px", left: "-96px" }}
             initial={{
-              x: -400, // Start far off screen to the left
-              y: -60,
-              rotate: -15,
-              scale: 0.8,
               opacity: 0,
+              scale: 0.95,
             }}
             animate={{
-              x: -96, // Final position
-              y: [-60, -65, -60], // Continuous floating animation
-              rotate: [-15, -12, -15], // Continuous slight rotation
-              scale: 1,
               opacity: 1,
+              scale: 1,
+              rotate: -12,
             }}
             transition={{
-              // Entry animation
-              x: { duration: 0.8, ease: "easeOut" },
-              opacity: { duration: 0.8 },
-              scale: { duration: 0.8 },
-              // Continuous animation
-              rotate: {
-                duration: 6,
-                repeat: Infinity,
-                repeatType: "reverse",
-                ease: "easeInOut",
-                delay: 0.8, // Start floating after entry
-              },
-              y: {
-                duration: 6,
-                repeat: Infinity,
-                repeatType: "reverse",
-                ease: "easeInOut",
-                delay: 0.8, // Start floating after entry
-              },
+              opacity: { duration: 0.6 },
+              scale: { duration: 0.5 },
+              rotate: { duration: 0.6 },
             }}
             whileHover={{
               scale: 1.05,
@@ -245,41 +246,21 @@ export default function HeroSection() {
 
           {/* Card 2 - Middle card */}
           <motion.div
-            className="absolute z-10"
+            className="absolute z-10 pointer-events-auto"
+            style={{ top: "-10px", left: "-8px" }}
             initial={{
-              x: 500, // Start far off screen to the right
-              y: -10,
-              rotate: 5,
-              scale: 0.8,
               opacity: 0,
+              scale: 0.95,
             }}
             animate={{
-              x: -8, // Final position
-              y: [-10, -15, -10], // Continuous floating animation
-              rotate: [5, 8, 5], // Continuous slight rotation
-              scale: 1,
               opacity: 1,
+              scale: 1,
+              rotate: 5,
             }}
             transition={{
-              // Entry animation with delay (second card)
-              x: { duration: 0.8, ease: "easeOut", delay: 0.2 },
-              opacity: { duration: 0.8, delay: 0.2 },
-              scale: { duration: 0.8, delay: 0.2 },
-              // Continuous animation
-              rotate: {
-                duration: 7,
-                repeat: Infinity,
-                repeatType: "reverse",
-                ease: "easeInOut",
-                delay: 1.0, // Start floating after entry
-              },
-              y: {
-                duration: 7,
-                repeat: Infinity,
-                repeatType: "reverse",
-                ease: "easeInOut",
-                delay: 1.0, // Start floating after entry
-              },
+              opacity: { duration: 0.6, delay: 0.1 },
+              scale: { duration: 0.5, delay: 0.1 },
+              rotate: { duration: 0.6, delay: 0.1 },
             }}
             whileHover={{
               scale: 1.05,
@@ -298,35 +279,21 @@ export default function HeroSection() {
 
           {/* E-Gift Card - Front card */}
           <motion.div
-            className="absolute z-20"
+            className="absolute z-20 pointer-events-auto"
+            style={{ top: "40px", left: "64px" }}
             initial={{
-              x: -300, // Start off screen to the left (different direction)
-              y: 200, // Start from below
-              rotate: -8,
-              scale: 0.8,
               opacity: 0,
+              scale: 0.95,
             }}
             animate={{
-              x: 64, // Final position
-              y: [40, 35, 40], // Continuous floating animation
-              rotate: [-8, -5, -8], // Continuous slight rotation
-              scale: 1,
               opacity: 1,
+              scale: 1,
+              rotate: -5,
             }}
             transition={{
-              // Entry animation with longer delay (third card)
-              x: { duration: 0.8, ease: "easeOut", delay: 0.4 },
-              y: { duration: 0.8, ease: "easeOut", delay: 0.4, times: [0, 1] },
-              opacity: { duration: 0.8, delay: 0.4 },
-              scale: { duration: 0.8, delay: 0.4 },
-              // Continuous animation
-              rotate: {
-                duration: 8,
-                repeat: Infinity,
-                repeatType: "reverse",
-                ease: "easeInOut",
-                delay: 1.2, // Start floating after entry
-              },
+              opacity: { duration: 0.6, delay: 0.2 },
+              scale: { duration: 0.5, delay: 0.2 },
+              rotate: { duration: 0.6, delay: 0.2 },
             }}
             whileHover={{
               scale: 1.05,
